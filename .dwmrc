@@ -1,0 +1,69 @@
+# Separators
+
+lightdark () {
+    echo -ne "\x0E\xC2\xB9\x02"
+}
+darklight () {
+    echo -ne "\x07\xC2\xB9\x09"
+}
+
+# Widget functions
+
+wifi () {
+    STATUS="X`/sbin/iwgetid`"
+    if test "$STATUS" != "X" ; then
+        ESSID="`/sbin/iwgetid |awk -F ":" '{print $2}'|sed -e 's/"//g'`"
+        QUALITY="`wicd-cli -d --wireless | awk '/Quality:/ {print $2}'`"
+        echo -ne "\xC2\xAC $QUALITY $ESSID"
+    else
+        echo -ne "\xC2\xAC Not Connected"
+    fi
+} 
+
+batt () {
+    PRESENT=`cat /sys/class/power_supply/BAT0/present`
+    STATUS=`cat /sys/class/power_supply/BAT0/status`
+    if [ "$PRESENT" != "0" ]; then
+        CHARGE=`cat /sys/class/power_supply/BAT0/capacity`
+        if [ $CHARGE -eq 100 ]; then
+            LEVEL="\xC2\xA6 ${CHARGE}"
+        elif [ $CHARGE -ge 80 ]; then
+            LEVEL="\xC2\xAB ${CHARGE}"
+        elif [ $CHARGE -ge 60 ]; then
+            LEVEL="\xC2\xAA ${CHARGE}"
+        elif [ $CHARGE -ge 40 ]; then
+            LEVEL="\xC2\xA9 ${CHARGE}"
+        elif [ $CHARGE -ge 20 ]; then
+            LEVEL="\xC2\xA8 ${CHARGE}"
+        else
+            LEVEL="\xC2\xA7 ${CHARGE}"
+        fi
+        case $STATUS in
+            Full)
+                SIGN="=";;
+            Charging)
+                SIGN="+";;
+            Discharging)
+                SIGN="-";;
+            Unknown)
+                SIGN="?";;
+        esac
+        echo -ne "$LEVEL${SIGN}"
+    else
+        echo "\xC2\xA6 AC"
+    fi
+}
+
+datetime () {
+    echo -e "\xC2\xAE `date '+%I:%M %p'`"
+}
+
+colortest () {
+    echo -ne "\x01\xC2\xB9\x06x06\x07x07 \x06\xC2\xB9\x01x01\x02x02 \x01\xC2\xB9\x08x08\x09x09 \x06\xC2\xB9\x03x03\x04x04"
+}
+
+# Send widget text to xsetroot, update every two seconds
+while true; do
+    xsetroot -name "`darklight``batt` `lightdark``wifi` `darklight``datetime`"
+    sleep 2
+done

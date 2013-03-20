@@ -46,12 +46,39 @@ batt () {
             Discharging)
                 SIGN="-";;
             Unknown)
-                SIGN="?";;
+                SIGN="+";;
         esac
+        # blink while charging
+        if [ $SIGN = "+" ] && [ $BLINK = "true" ]; then
+            LEVEL="\xC2\xA6 ${CHARGE}"
+        fi
         echo -ne "$LEVEL${SIGN}"
     else
         echo "\xC2\xA6 AC"
     fi
+}
+
+cpu() {
+      CPU="$(eval $(awk '/^cpu /{print "previdle=" $5 "; prevtotal=" $2+$3+$4+$5 }' /proc/stat); sleep 0.4; 
+      eval $(awk '/^cpu /{print "idle=" $5 "; total=" $2+$3+$4+$5 }' /proc/stat); 
+      intervaltotal=$((total-${prevtotal:-0})); 
+      echo "$((100*( (intervaltotal) - ($idle-${previdle:-0}) ) / (intervaltotal) ))")"
+      echo -ne "\xC2\xA5 $CPU%"
+}
+
+mem () {
+    MEM="`free -m | awk 'NR==3 { print $3 }'`"
+    echo -ne "\xC2\xA4 $MEM MB"
+}
+
+cputemp () {
+    TEMP="`sensors | awk 'NR==3 {print substr($2,2,4)}'`"
+    echo -ne "\xC3\x81 $TEMP\xC2\xBAC"
+}
+
+fanspeed () {
+    SPEED="`cat /sys/bus/platform/devices/thinkpad_hwmon/fan1_input`"
+    echo -ne "\xC3\x80 $SPEED RPM"
 }
 
 datetime () {
@@ -62,8 +89,19 @@ colortest () {
     echo -ne "\x01\xC2\xB9\x06x06\x07x07 \x06\xC2\xB9\x01x01\x02x02 \x01\xC2\xB9\x08x08\x09x09 \x06\xC2\xB9\x03x03\x04x04"
 }
 
+# boolean variable, flipped every update to allow for blinking
+BLINK=true
+invert () {
+    if [ $BLINK = "true" ]; then
+        BLINK=false 
+    else
+        BLINK=true
+    fi
+}
+
 # Send widget text to xsetroot, update every two seconds
 while true; do
-    xsetroot -name "`darklight``batt` `lightdark``wifi` `darklight``datetime`"
+    invert;
+    xsetroot -name "`darklight``cpu` `lightdark``mem` `darklight``cputemp` `lightdark``fanspeed` `darklight``batt` `lightdark``wifi` `darklight``datetime`"
     sleep 2
 done

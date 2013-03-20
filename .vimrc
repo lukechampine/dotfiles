@@ -8,6 +8,11 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 
+" Set gutter
+set number
+set numberwidth=3
+highlight LineNr ctermfg=DarkGrey
+
 " Get rid of that stupid timeout lag
 set timeout ttimeoutlen=0
 

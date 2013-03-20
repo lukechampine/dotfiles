@@ -1,0 +1,35 @@
+! --- urxvt settings --- !
+urxvt.geometry:		85x21
+urxvt.saveLines:	4096
+urxvt.foreground:	#FFFFFF
+urxvt.background:	#000000
+urxvt.font:  		xft:fixed:size=10
+urxvt.boldFont:		fixed
+urxvt.scrollBar:	false
+urxvt.cursorBlink:	true
+
+! ------- colors ------- !
+!black
+*color0:            #080808
+*color8:            #232526
+!red
+*color1:            #F92672
+*color9:            #F9367a
+!green
+*color2:            #a6e22e
+*color10:           #aee23e
+!yellow
+*color3:            #fd971f
+*color11:           #fd9f2f
+!blue
+*color4:            #55aaff
+*color12:           #65b2ff
+!magenta
+*color5:            #ae81ff
+*color13:           #b691ff
+!cyan
+*color6:            #66d9ef
+*color14:           #76e1ef
+!white
+*color7:            #465457
+*color15:           #ffffff

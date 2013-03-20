@@ -10,26 +10,26 @@ urxvt.cursorBlink:	true
 
 ! ------- colors ------- !
 !black
-*color0:            #080808
-*color8:            #232526
+*color0:            #170D0D
+*color8:            #8A7C71
 !red
-*color1:            #F92672
-*color9:            #F9367a
+*color1:            #840A07
+*color9:            #C12204
 !green
-*color2:            #a6e22e
-*color10:           #aee23e
+*color2:            #1A2B23
+*color10:           #3B7451
 !yellow
-*color3:            #fd971f
-*color11:           #fd9f2f
+*color3:            #955728
+*color11:           #CF9742
 !blue
-*color4:            #55aaff
-*color12:           #65b2ff
+*color4:            #2D3751
+*color12:           #59727B
 !magenta
-*color5:            #ae81ff
-*color13:           #b691ff
+*color5:            #560451
+*color13:           #9B3F6E
 !cyan
-*color6:            #66d9ef
-*color14:           #76e1ef
+*color6:            #66969D
+*color14:           #ACE0CD
 !white
-*color7:            #465457
+*color7:            #E6E5F0
 *color15:           #ffffff

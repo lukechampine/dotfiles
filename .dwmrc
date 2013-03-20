@@ -1,5 +1,4 @@
 # Separators
-
 lightdark () {
     echo -ne "\x0E\xC2\xB9\x02"
 }
@@ -8,7 +7,6 @@ darklight () {
 }
 
 # Widget functions
-
 wifi () {
     STATUS="X`/sbin/iwgetid`"
     if test "$STATUS" != "X" ; then

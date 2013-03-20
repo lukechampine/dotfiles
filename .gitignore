@@ -1,3 +1,5 @@
+# don't add yourself, silly
+.gitignore
 # don't look at backup files
 .bck
 # arcane secrets in here

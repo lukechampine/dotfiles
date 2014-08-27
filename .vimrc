@@ -3,6 +3,12 @@ execute pathogen#infect()
 syntax on
 filetype plugin indent on
 
+" go fmt
+autocmd BufWritePre *.go Fmt
+
+" Set colors
+colorscheme brushstrokes
+
 " Set tab width
 set tabstop=4
 set shiftwidth=4
@@ -16,8 +22,14 @@ highlight LineNr ctermfg=DarkGrey
 " Get rid of that stupid timeout lag
 set timeout ttimeoutlen=0
 
-" <Ctrl-l> redraws the screen and removes any search highlighting.
-nnoremap <silent> <C-l> :nohl<CR><C-l>
+" Search highlighting
+nnoremap <silent> ; :set invhlsearch<CR>
+set viminfo+=/0
+set incsearch
+
+" F7 toggles spellcheck
+map <F7> :setlocal spell! spelllang=en_us<CR>
+
 " <Ctrl-n> opens NERDTree
 map <C-n> :NERDTreeToggle<CR>
 

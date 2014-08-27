@@ -11,4 +11,4 @@ sh ~/.dwmrc &
 setxkbmap -option caps:escape
 
 # Start window manager
-exec dwm
+exec ldwm

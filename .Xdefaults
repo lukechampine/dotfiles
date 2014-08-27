@@ -3,8 +3,8 @@ urxvt.geometry:		85x21
 urxvt.saveLines:	4096
 urxvt.foreground:	#FFFFFF
 urxvt.background:	#000000
-urxvt.font:  		xft:fixed:size=10
-urxvt.boldFont:		fixed
+urxvt.font:  		fixedterm
+urxvt.boldFont:		fixedterm
 urxvt.scrollBar:	false
 urxvt.cursorBlink:	true
 
@@ -16,8 +16,8 @@ urxvt.cursorBlink:	true
 *color1:            #840A07
 *color9:            #C12204
 !green
-*color2:            #1A2B23
-*color10:           #3B7451
+*color2:            #3A5749
+*color10:           #4A8C64
 !yellow
 *color3:            #955728
 *color11:           #CF9742

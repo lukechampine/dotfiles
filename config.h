@@ -1,5 +1,10 @@
 /* See LICENSE file for copyright and license details. */
 
+/* for media keys */
+#include <X11/XF86keysym.h>
+#define XK_VolUp XF86XK_AudioRaiseVolume
+#define XK_VolDn XF86XK_AudioLowerVolume
+
 /* appearance */
 static const char font[]            = "-*-terminus2-*-*-*-*-*-*-*-*-*-*-*-*";
 
@@ -61,15 +66,19 @@ static const Layout layouts[] = {
 static const char *dmenucmd[] = { "dmenu_run", "-fn", font, "-nb", statuscolors[0][ColBG], "-nf", statuscolors[0][ColFG], "-sb", statuscolors[1][ColBG], "-sf", statuscolors[1][ColFG], NULL };
 static const char *termcmd[] = { "urxvt", NULL };
 static const char *browser[] = { "firefox", NULL };
-static const char *volumeup[] = { "amixer", "-q", "set", "PCM", "2%+", NULL };
-static const char *volumedown[] = { "amixer", "-q", "set", "PCM", "2%-", NULL };
+static const char *volumeup[] = { "amixer", "-q", "set", "PCM", "3dB+", NULL };
+static const char *volumedown[] = { "amixer", "-q", "set", "PCM", "3dB-", NULL };
 static const char *htop[] = { "urxvt", "-e", "htop" };
+static const char *slimlock[] = { "slimlock" };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_r,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      spawn,          {.v = browser } },
+	{ MODKEY|ShiftMask,             XK_l,      spawn,          {.v = slimlock } },
+	{ MODKEY,                       XK_r,      spawn,          {.v = dmenucmd } },
+    { 0,                            XK_VolUp,  spawn,          {.v = volumeup } },
+    { 0,                            XK_VolDn,  spawn,          {.v = volumedown } },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1} },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1} },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1} },
@@ -85,8 +94,6 @@ static Key keys[] = {
 	{ MODKEY,                       XK_m,      setlayout,      {.i = 3} },
 	{ MODKEY,                       XK_space,  setlayout,      {.i =-1} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-	{ MODKEY,                       XK_equal,  spawn,          {.v = volumeup} },
-	{ MODKEY,                       XK_minus,  spawn,          {.v = volumedown} },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)

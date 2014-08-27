@@ -1,22 +1,12 @@
 # Separators
-lightdark () {
-    echo -ne "\x0E\xC2\xB9\x02"
-}
 darklight () {
-    echo -ne "\x07\xC2\xB9\x09"
+    echo -ne "\x01\xC2\xB9\x02"
+}
+lightdark () {
+    echo -ne "\x03\xC2\xB9\x04"
 }
 
 # Widget functions
-wifi () {
-    STATUS="X`/sbin/iwgetid`"
-    if test "$STATUS" != "X" ; then
-        ESSID="`/sbin/iwgetid |awk -F ":" '{print $2}'|sed -e 's/"//g'`"
-        QUALITY="`wicd-cli -d --wireless | awk '/Quality:/ {print $2}'`"
-        echo -ne "\xC2\xAC $QUALITY $ESSID"
-    else
-        echo -ne "\xC2\xAC Not Connected"
-    fi
-} 
 
 batt () {
     PRESENT=`cat /sys/class/power_supply/BAT0/present`
@@ -24,17 +14,17 @@ batt () {
     if [ "$PRESENT" != "0" ]; then
         CHARGE=`cat /sys/class/power_supply/BAT0/capacity`
         if [ $CHARGE -eq 100 ]; then
-            LEVEL="\xC2\xA6 ${CHARGE}"
+            SYMBOL="\xC2\xA6"
         elif [ $CHARGE -ge 80 ]; then
-            LEVEL="\xC2\xAB ${CHARGE}"
+            SYMBOL="\xC2\xAB"
         elif [ $CHARGE -ge 60 ]; then
-            LEVEL="\xC2\xAA ${CHARGE}"
+            SYMBOL="\xC2\xAA"
         elif [ $CHARGE -ge 40 ]; then
-            LEVEL="\xC2\xA9 ${CHARGE}"
+            SYMBOL="\xC2\xA9"
         elif [ $CHARGE -ge 20 ]; then
-            LEVEL="\xC2\xA8 ${CHARGE}"
+            SYMBOL="\xC2\xA8"
         else
-            LEVEL="\xC2\xA7 ${CHARGE}"
+            SYMBOL="\xC2\xA7"
         fi
         case $STATUS in
             Full)
@@ -44,29 +34,28 @@ batt () {
             Discharging)
                 SIGN="-";;
             Unknown)
-                SIGN="+";;
+                SIGN="?";;
         esac
         # blink while charging
         if [ $SIGN = "+" ] && [ $BLINK = "true" ]; then
-            LEVEL="\xC2\xA6 ${CHARGE}"
+            SYMBOL="\xC2\xA6"
         fi
-        echo -ne "$LEVEL${SIGN}"
+        # blink while dying
+        if [ $SIGN = "-" ] && [ $CHARGE -le 20 ] && [ $BLINK = "true" ]; then
+            CHARGE="\x05$CHARGE"
+        fi
+        echo -ne "$SYMBOL $CHARGE${SIGN}"
     else
         echo "\xC2\xA6 AC"
     fi
 }
 
 cpu() {
-      CPU="$(eval $(awk '/^cpu /{print "previdle=" $5 "; prevtotal=" $2+$3+$4+$5 }' /proc/stat); sleep 0.4; 
-      eval $(awk '/^cpu /{print "idle=" $5 "; total=" $2+$3+$4+$5 }' /proc/stat); 
-      intervaltotal=$((total-${prevtotal:-0})); 
-      echo "$((100*( (intervaltotal) - ($idle-${previdle:-0}) ) / (intervaltotal) ))")"
-      echo -ne "\xC2\xA5 $CPU%"
-}
-
-mem () {
-    MEM="`free -m | awk 'NR==3 { print $3 }'`"
-    echo -ne "\xC2\xA4 $MEM MB"
+    CPU="$(eval $(awk '/^cpu /{print "previdle=" $5 "; prevtotal=" $2+$3+$4+$5 }' /proc/stat); sleep 0.4;
+        eval $(awk '/^cpu /{print "idle=" $5 "; total=" $2+$3+$4+$5 }' /proc/stat);
+        intervaltotal=$((total-${prevtotal:-0}));
+        echo "$((100*( (intervaltotal) - ($idle-${previdle:-0}) ) / (intervaltotal) ))")"
+    echo -ne "\xC2\xA5 $CPU%"
 }
 
 cputemp () {
@@ -74,17 +63,45 @@ cputemp () {
     echo -ne "\xC3\x81 $TEMP\xC2\xBAC"
 }
 
+datetime () {
+    echo -e "\xC2\xAE `date '+%I:%M %p'`"
+}
+
 fanspeed () {
     SPEED="`cat /sys/bus/platform/devices/thinkpad_hwmon/fan1_input`"
     echo -ne "\xC3\x80 $SPEED RPM"
 }
 
-datetime () {
-    echo -e "\xC2\xAE `date '+%I:%M %p'`"
+mem () {
+    MEM="`free -m | awk 'NR==3 { print $3 }'`"
+    echo -ne "\xC2\xA4 $MEM MB"
 }
 
-colortest () {
-    echo -ne "\x01\xC2\xB9\x06x06\x07x07 \x06\xC2\xB9\x01x01\x02x02 \x01\xC2\xB9\x08x08\x09x09 \x06\xC2\xB9\x03x03\x04x04"
+vol () {
+    VOL="`amixer sget PCM | awk 'NR==6 {print}' | cut -f 2 -d '[' | cut -f 1 -d '%'`"
+    if [ $VOL -ge 60 ]; then
+        LEVEL="\xC2\xB2 ${VOL}%"
+    elif [ $VOL -ge 30 ]; then
+        LEVEL="\xC2\xB1 ${VOL}%"
+    else
+        LEVEL="\xC2\xB0 ${VOL}%"
+    fi
+    echo -ne "$LEVEL"
+}
+
+wifi () {
+    LAN="`ifconfig eth0 | awk '/inet / {print $2}'`"
+    WLAN="`/sbin/iwgetid`"
+    if [ -n "$WLAN" ]; then
+        ESSID="`/sbin/iwgetid | awk -F \":\" '{print $2}' | sed -e 's/\"//g'`"
+        QUALITY="`cat /proc/net/wireless | tail -1 | cut -b 16-17`"
+        let QUALITY=QUALITY*100/70
+        echo -ne "\xC2\xAC $ESSID"
+    elif [ -n "$LAN" ]; then
+        echo -ne "\xC2\xAD $LAN"
+    else
+        echo -ne "\xC2\xAD Not connected"
+    fi
 }
 
 # boolean variable, flipped every update to allow for blinking
@@ -100,6 +117,6 @@ invert () {
 # Send widget text to xsetroot, update every two seconds
 while true; do
     invert;
-    xsetroot -name "`darklight``cpu` `lightdark``mem` `darklight``cputemp` `lightdark``fanspeed` `darklight``batt` `lightdark``wifi` `darklight``datetime`"
-    sleep 2
+    xsetroot -name "`darklight``cpu` `lightdark``mem` `darklight``cputemp` `lightdark``fanspeed` `darklight``wifi` `lightdark``vol` `darklight``batt` `lightdark``datetime`"
+    sleep 1
 done

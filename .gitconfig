@@ -1,0 +1,27 @@
+[user]
+	email = luke.champine@gmail.com
+	name = lukechampine
+[core]
+	editor = vim
+[alias]
+    rsh = reset --soft HEAD^
+    rhh = reset --hard HEAD^
+    ca = commit --amend
+    rh = reset HEAD
+    c = commit -m
+    s = status
+    co = checkout
+    com = checkout master
+    rbm = rebase master
+    rc = rebase --continue
+    cp = cherry-pick
+    fix-dates = "filter-branch -f --env-filter 'GIT_COMMITTER_DATE=$GIT_AUTHOR_DATE; export GIT_COMMITTER_DATE'"
+    au = add -u
+    pf = push --force
+    pum = pull upstream master
+    pom = push origin master
+    prum = pull --rebase upstream master
+    d = diff
+    ds = diff --staged
+    cb = checkout -b
+    sp = stash pop
